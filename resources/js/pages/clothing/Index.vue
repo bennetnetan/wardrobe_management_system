@@ -1,15 +1,32 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Table, TableBody, TableCaption, TableCell, TableEmpty, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table/';
+import { Table, TableBody, TableCaption, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table/';
+import { ref, computed } from 'vue';
+import { Select, SelectItem, SelectValue, SelectTrigger, SelectContent } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Plus, X, Search } from 'lucide-vue-next';
+import Button from '@/components/ui/button/Button.vue';
 
-defineProps<{
+const props = defineProps<{
     name?: string,
-    clothing?: Array<{ id: number, name: string, price: number, description: string, quantity: number }>,
+    clothing?: Array<{ id: number, name: string, price: number, description: string, quantity: number; category: string}>,
 }>();
+
+const searchTerm = ref('');
+const selectedCategory = ref('');
+
+const filteredClothing = computed(() => {
+    return props.clothing?.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+                            item.description.toLowerCase().includes(searchTerm.value.toLowerCase());
+        const matchesCategory = !selectedCategory.value || item.category === selectedCategory.value;
+        return matchesSearch && matchesCategory;
+    }) ?? [];
+});
 
 const editItem = (id: number) => {
   router.visit(route('clothing.edit', { id }));
@@ -27,68 +44,126 @@ const createItem = () => {
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-    {
         title: 'Clothing',
         href: '/clothing',
-    },
+    }
 ];
 </script>
+
 
 <template>
   <div>
     <Head title="Clothing" />
     <AppLayout :breadcrumbs="breadcrumbs">
-      <div class="flex justify-end mb-4">
-        <button @click="createItem" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors">
-          Create New
-        </button>
-        <!-- <Link
-          :href="route('clothing.create')"
-          class="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
+      <div class="mb-4">
+        <Button 
+          @click="createItem" 
+          class="float-right bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
         >
-          Create
-        </Link> -->
-        <!-- <Link
-            :href="route('clothing.create')"
-            class="inline-block rounded-sm border border-transparent px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#19140035] dark:text-[#EDEDEC] dark:hover:border-[#3E3E3A]"
-        >
-            Log in
-        </Link> -->
+          <Plus class="h-4 w-4" /> Add Item
+        </Button> 
+        <h1 class="text-2xl font-semibold text-gray-200 pl-5 pt-3">Clothing Inventory</h1>
       </div>
 
-      <div class="overflow-x-auto">
+      <!-- Filter/Search Bar -->
+      <div class="flex flex-col sm:flex-row gap-3 mb-6 px-4">
+        <div class="relative flex-1 max-w-md">
+          <Input 
+            v-model="searchTerm"
+            placeholder="Search items..."
+            class="pl-10"
+          />
+          <Search class="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+        </div>
+
+        <div class="flex gap-2 items-center">
+          <Select v-model="selectedCategory" class="w-48">
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="tops">Tops</SelectItem>
+              <SelectItem value="bottoms">Bottoms</SelectItem>
+              <SelectItem value="shoes">Shoes</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Button 
+            @click="selectedCategory = ''; searchTerm = ''" 
+            class="h-10 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+            title="Clear filters"
+          >
+            <X class="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="rounded-lg border border-gray-500 overflow-hidden">
         <Table class="w-full">
-          <TableCaption class="text-lg font-semibold mb-4">Clothing List</TableCaption>
-          <TableHeader class="bg-blue-800">
+          <TableHeader class="bg-gray-900 text-gray-700">
             <TableRow>
-              <TableHead class="px-4 py-2 text-left">Name</TableHead>
-              <TableHead class="px-4 py-2 text-left">Price</TableHead>
-              <TableHead class="px-4 py-2 text-left">Quantity</TableHead>
-              <TableHead class="px-4 py-2 text-left">Description</TableHead>
-              <TableHead class="px-4 py-2 text-left">Actions</TableHead>
+              <TableHead class="px-4 py-3">Name</TableHead>
+              <TableHead class="px-4 py-3">Price</TableHead>
+              <TableHead class="px-4 py-3">Quantity</TableHead>
+              <TableHead class="px-4 py-3">Description</TableHead>
+              <TableHead class="px-4 py-3">Category</TableHead>
+              <TableHead class="px-4 py-3 w-32">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="item in clothing" :key="item.id" class="hover:bg-gray-700 transition-colors">
-              <TableCell class="px-4 py-2">{{ item.name }}</TableCell>
-              <TableCell class="px-4 py-2">${{ item.price.toFixed(2) }}</TableCell>
-                <TableCell class="px-4 py-2">{{ item.quantity }}</TableCell>
-              <TableCell class="px-4 py-2">{{ item.description }}</TableCell>
-              <TableCell class="px-4 py-2">
-                <button @click="editItem(item.id)" class="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
-                <button @click="deleteItem(item.id)" class="text-red-500 hover:text-red-700">Delete</button>
+            <TableRow 
+              v-for="item in filteredClothing" 
+              :key="item.id"
+              class="hover:bg-gray-800 transition-colors"
+            >
+              <TableCell class="px-4 py-3 font-medium">{{ item.name }}</TableCell>
+              <TableCell class="px-4 py-3">${{ item.price.toFixed(2) }}</TableCell>
+              <TableCell class="px-4 py-3">
+                <span class="px-2 py-1 rounded-full bg-blue-200 text-blue-800 text-sm">
+                  {{ item.quantity }}
+                </span>
+              </TableCell>
+              <TableCell class="px-4 py-3 text-gray-200 max-w-[300px] truncate">
+                {{ item.description }}
+              </TableCell>
+              <TableCell class="px-4 py-3">
+                <span class="capitalize px-3 py-1 rounded-full text-sm"
+                      :class="{
+                        'bg-purple-400 text-purple-800': item.category === 'tops',
+                        'bg-green-400 text-green-800': item.category === 'bottoms',
+                        'bg-orange-400 text-orange-800': item.category === 'shoes'
+                      }">
+                  {{ item.category }}
+                </span>
+              </TableCell>
+              <TableCell class="px-4 py-3">
+                <div class="flex gap-3">
+                  <button 
+                    @click="editItem(item.id)"
+                    class="text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button 
+                    @click="deleteItem(item.id)"
+                    class="text-red-600 hover:text-red-800 transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
               </TableCell>
             </TableRow>
           </TableBody>
         </Table>
-      </div>
 
-      <template v-if="!clothing || !clothing.length">
-        <TableEmpty class="text-center py-8 text-gray-500">No clothing items found.</TableEmpty>
-      </template>
+        <TableEmpty 
+          v-if="!filteredClothing.length" 
+          class="py-8 text-gray-500 text-center"
+        >
+          No items found matching your criteria
+        </TableEmpty>
+      </div>
     </AppLayout>
   </div>
 </template>

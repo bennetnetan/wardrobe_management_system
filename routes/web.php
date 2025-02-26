@@ -8,9 +8,8 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('home');
 
-Route::get('dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('dashboard', [ClothingController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
 // Clothing routes
 Route::get('clothing', [ClothingController::class, 'index'])->middleware(['auth', 'verified'])->name('clothing.index');

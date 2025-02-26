@@ -64,4 +64,35 @@ class ClothingController extends Controller
         $clothing->delete();
         return redirect()->route('clothing.index');
     }
+
+    // Get clothing data for Dashboard
+    public function dashboard()
+    {
+        $clothing = Clothing::all();
+        $total = $clothing->sum('price');
+        $quantity = $clothing->sum('quantity');
+        // Get unique categories count
+        $categories_count = $clothing->unique('category')->count();
+        // Get unique categories
+        $categories = $clothing->unique('category')->pluck('category');
+        // Get total price for each category
+        $categoryTotal = [];
+        foreach ($categories as $category) {
+            $categoryTotal[$category] = $clothing->where('category', $category)->sum('price');
+        }
+        // Get total quantity for each category
+        $categoryQuantity = [];
+        foreach ($categories as $category) {
+            $categoryQuantity[$category] = $clothing->where('category', $category)->sum('quantity');
+        }
+        // dd($categoryQuantity, $categoryTotal, $categories, $quantity, $total);
+        return Inertia::render('Dashboard', [
+            'total' => $total, 
+            'quantity' => $quantity, 
+            'categories_count' => $categories_count, 
+            'categories' => $categories, 
+            'categoryTotal' => $categoryTotal, 
+            'categoryQuantity' => $categoryQuantity
+        ]);
+    }
 }
