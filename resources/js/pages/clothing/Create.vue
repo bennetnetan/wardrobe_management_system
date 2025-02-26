@@ -15,8 +15,10 @@ const form = useForm({
   price: 0,
   description: '',
   quantity: 0,
-  category: '',
+  category_id: null
 });
+
+defineProps<{ categories: { id: number; name: string }[] }>();
 
 const submit = () => {
   form.post(route('clothing.store'));
@@ -80,19 +82,17 @@ const breadcrumbs: BreadcrumbItem[] = [
             <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
             <Select 
                 id="category" 
-                v-model="form.category"
+                v-model="form.category_id"
                 required>
               <SelectTrigger>
-                <SelectValue placeholder="Select" />
+                <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent
                 position="popper" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" >
-                  <SelectItem value="tops">Tops</SelectItem>
-                  <SelectItem value="bottoms">Bottoms</SelectItem>
-                  <SelectItem value="shoes">Shoes</SelectItem>
+                  <SelectItem :value="category.id" v-for="category in categories">{{ category.name }}</SelectItem>
                 </SelectContent>
             </Select>
-            <p v-if="form.errors.category" class="mt-2 text-sm text-red-600">{{ form.errors.category }}</p>
+            <p v-if="form.errors.category_id" class="mt-2 text-sm text-red-600">{{ form.errors.category_id }}</p>
           </div>
 
           <div>

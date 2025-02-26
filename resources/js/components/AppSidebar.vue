@@ -19,6 +19,11 @@ const mainNavItems: NavItem[] = [
         href: '/clothing',
         icon: ShirtIcon,
     },
+    {
+        title: 'Categories',
+        href: '/categories',
+        icon: BookOpen,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

@@ -10,7 +10,8 @@ import { Select, SelectItem, SelectValue, SelectLabel,  SelectTrigger,  SelectCo
 import {Head} from '@inertiajs/vue3';
 
 const props = defineProps<{
-  clothing: { id: number; name: string; price: number; description: string; quantity: number; category: string };
+  clothing: { id: number; name: string; price: number; description: string; quantity: number; category_id: number };
+  categories: { id: number; name: string }[];
 }>();
 
 const form = useForm({
@@ -18,7 +19,7 @@ const form = useForm({
   price: props.clothing.price,
   description: props.clothing.description,
   quantity: props.clothing.quantity,
-  category: props.clothing.category,
+  category_id: props.clothing.category_id,
 });
 
 const submit = () => {
@@ -81,21 +82,20 @@ const breadcrumbs: BreadcrumbItem[] = [
 
           <div>
             <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+
             <Select 
-                id="category" 
-                v-model="form.category"
-                required>
+              id="category" 
+              v-model="form.category_id"
+              required>
               <SelectTrigger>
-                <SelectValue placeholder="Select" />
+              <SelectValue placeholder="Select Category" />
               </SelectTrigger>
-              <SelectContent 
-                position="popper" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" >
-                  <SelectItem value="tops">Tops</SelectItem>
-                  <SelectItem value="bottoms">Bottoms</SelectItem>
-                  <SelectItem value="shoes">Shoes</SelectItem>
-                </SelectContent>
+              <SelectContent
+              position="popper" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" >
+                <SelectItem :value="category.id" v-for="category in props.categories" :key="category.id">{{ category.name }}</SelectItem>
+              </SelectContent>
             </Select>
-            <p v-if="form.errors.category" class="mt-2 text-sm text-red-600">{{ form.errors.category }}</p>
+            <p v-if="form.errors.category_id" class="mt-2 text-sm text-red-600">{{ form.errors.category_id }}</p>
           </div>          
 
           <div>

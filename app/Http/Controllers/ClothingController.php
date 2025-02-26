@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Clothing;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
+use function Pest\Laravel\call;
 
 class ClothingController extends Controller
 {
@@ -12,14 +15,15 @@ class ClothingController extends Controller
     public function index()
     {
         $clothing = Clothing::all();
-        // $clothing = Clothing::paginate(10);
         return Inertia::render('clothing/Index', ['clothing' => $clothing]);
     }
 
     // Show the form for creating a new clothing item
     public function create()
     {
-        return Inertia::render('clothing/Create');
+        return Inertia::render('clothing/Create',[
+            'categories' => Category::all()
+        ]);
     }
 
     // Store a new clothing item
@@ -30,6 +34,7 @@ class ClothingController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'quantity' => 'required|integer',
+            'category_id' => 'required|exists:categories,id',
         ]);
 
         Clothing::create($request->all());
@@ -40,7 +45,10 @@ class ClothingController extends Controller
     // Show the form for editing a clothing item
     public function edit(Clothing $clothing)
     {
-        return Inertia::render('clothing/Edit', ['clothing' => $clothing]);
+        return Inertia::render('clothing/Edit', [
+            'clothing' => $clothing,
+            'categories' => Category::all()
+        ]);
     }
 
     // Update a clothing item
@@ -71,26 +79,27 @@ class ClothingController extends Controller
         $clothing = Clothing::all();
         $total = $clothing->sum('price');
         $quantity = $clothing->sum('quantity');
+        
         // Get unique categories count
-        $categories_count = $clothing->unique('category')->count();
-        // Get unique categories
-        $categories = $clothing->unique('category')->pluck('category');
-        // Get total price for each category
+        $categories_count = Category::count();
+        
+        // Get all categories
+        $categories = Category::all();
+        
+        // Get total price and quantity for each category
         $categoryTotal = [];
-        foreach ($categories as $category) {
-            $categoryTotal[$category] = $clothing->where('category', $category)->sum('price');
-        }
-        // Get total quantity for each category
         $categoryQuantity = [];
+        
         foreach ($categories as $category) {
-            $categoryQuantity[$category] = $clothing->where('category', $category)->sum('quantity');
+            $categoryTotal[$category->name] = $clothing->where('category_id', $category->id)->sum('price');
+            $categoryQuantity[$category->name] = $clothing->where('category_id', $category->id)->sum('quantity');
         }
-        // dd($categoryQuantity, $categoryTotal, $categories, $quantity, $total);
+        
         return Inertia::render('Dashboard', [
             'total' => $total, 
             'quantity' => $quantity, 
             'categories_count' => $categories_count, 
-            'categories' => $categories, 
+            'categories' => $categories->pluck('name'), 
             'categoryTotal' => $categoryTotal, 
             'categoryQuantity' => $categoryQuantity
         ]);
