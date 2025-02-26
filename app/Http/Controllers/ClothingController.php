@@ -12,13 +12,14 @@ class ClothingController extends Controller
     public function index()
     {
         $clothing = Clothing::all();
-        return Inertia::render('Clothing/Index', ['clothing' => $clothing]);
+        // $clothing = Clothing::paginate(10);
+        return Inertia::render('clothing/Index', ['clothing' => $clothing]);
     }
 
     // Show the form for creating a new clothing item
     public function create()
     {
-        return Inertia::render('Clothing/Create');
+        return Inertia::render('clothing/Create');
     }
 
     // Store a new clothing item
@@ -39,7 +40,7 @@ class ClothingController extends Controller
     // Show the form for editing a clothing item
     public function edit(Clothing $clothing)
     {
-        return Inertia::render('Clothing/Edit', ['clothing' => $clothing]);
+        return Inertia::render('clothing/Edit', ['clothing' => $clothing]);
     }
 
     // Update a clothing item

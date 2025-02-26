@@ -66,6 +66,7 @@ const breadcrumbs: BreadcrumbItem[] = [
             <TableRow>
               <TableHead class="px-4 py-2 text-left">Name</TableHead>
               <TableHead class="px-4 py-2 text-left">Price</TableHead>
+              <TableHead class="px-4 py-2 text-left">Quantity</TableHead>
               <TableHead class="px-4 py-2 text-left">Description</TableHead>
               <TableHead class="px-4 py-2 text-left">Actions</TableHead>
             </TableRow>
@@ -74,6 +75,7 @@ const breadcrumbs: BreadcrumbItem[] = [
             <TableRow v-for="item in clothing" :key="item.id" class="hover:bg-gray-700 transition-colors">
               <TableCell class="px-4 py-2">{{ item.name }}</TableCell>
               <TableCell class="px-4 py-2">${{ item.price.toFixed(2) }}</TableCell>
+                <TableCell class="px-4 py-2">{{ item.quantity }}</TableCell>
               <TableCell class="px-4 py-2">{{ item.description }}</TableCell>
               <TableCell class="px-4 py-2">
                 <button @click="editItem(item.id)" class="text-blue-500 hover:text-blue-700 mr-2">Edit</button>
