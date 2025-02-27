@@ -88,31 +88,44 @@ class ClothingController extends Controller
     // Get clothing data for Dashboard
     public function dashboard()
     {
-        $clothing = Clothing::all()->where('user_id', Auth::user()->id);
+        $userId = Auth::id();
+
+        // Get user's clothing with category relationships
+        $clothing = Clothing::with('category')
+            ->where('user_id', $userId)
+            ->get();
+
+        // Calculate totals directly from collection
         $total = $clothing->sum('price');
         $quantity = $clothing->sum('quantity');
-        
-        // Get unique categories count
-        $categories_count = Category::count();
-        
-        // Get all categories
-        $categories = Category::all();
-        
-        // Get total price and quantity for each category
+
+        // Get unique categories actually used in clothing
+        $categories = $clothing->map(fn($item) => $item->category)
+            ->filter()
+            ->unique('id')
+            ->values();
+
+        // Group clothing by category for efficient calculations
+        $groupedByCategory = $clothing->groupBy('category_id');
+
+        // Calculate category totals using grouped collection
         $categoryTotal = [];
         $categoryQuantity = [];
         
-        foreach ($categories as $category) {
-            $categoryTotal[$category->name] = $clothing->where('category_id', $category->id)->sum('price');
-            $categoryQuantity[$category->name] = $clothing->where('category_id', $category->id)->sum('quantity');
+        foreach ($groupedByCategory as $categoryId => $items) {
+            $category = $categories->firstWhere('id', $categoryId);
+            if ($category) {
+                $categoryTotal[$category->name] = $items->sum(fn($item) => $item->price * $item->quantity);
+                $categoryQuantity[$category->name] = $items->sum('quantity');
+            }
         }
-        
+
         return Inertia::render('Dashboard', [
-            'total' => $total, 
-            'quantity' => $quantity, 
-            'categories_count' => $categories_count, 
-            'categories' => $categories->pluck('name'), 
-            'categoryTotal' => $categoryTotal, 
+            'total' => $total,
+            'quantity' => $quantity,
+            'categories_count' => $categories->count(),  // Only categories with clothing
+            'categories' => $categories->pluck('name'), // Only used categories
+            'categoryTotal' => $categoryTotal,
             'categoryQuantity' => $categoryQuantity
         ]);
     }
