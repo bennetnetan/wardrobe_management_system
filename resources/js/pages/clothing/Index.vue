@@ -78,7 +78,7 @@ const breadcrumbs: BreadcrumbItem[] = [
           <Rocket class="h-6 w-6 text-blue-500" />
           <AlertTitle class="text-xl font-bold">Welcome to Your Wardrobe Management System!</AlertTitle>
           <AlertDescription class="text-sm">
-        Please add a category before adding clothing items.
+        Please add a missing category before adding clothing items.
           </AlertDescription>
           <button @click="showAlert = false" class="absolute top-2 right-2 text-red-500">
         <X class="h-4 w-4" />
