@@ -9,6 +9,7 @@ import { ref, computed } from 'vue';
 import { Select, SelectItem, SelectValue, SelectTrigger, SelectContent } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Plus, X, Search } from 'lucide-vue-next';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import Button from '@/components/ui/button/Button.vue';
 
 const props = defineProps<{
@@ -18,6 +19,7 @@ const props = defineProps<{
 }>();
 
 const searchTerm = ref('');
+const showAlert = ref(true);
 const selectedCategory = ref('');
 
 const filteredClothing = computed(() => {
@@ -55,6 +57,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/clothing',
     }
 ];
+
 </script>
 
 
@@ -71,7 +74,16 @@ const breadcrumbs: BreadcrumbItem[] = [
         </Button> 
         <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 pl-5 pt-3">Clothing Inventory</h1>
       </div>
-
+      <Alert class="mb-6 w-full max-w-[335px] lg:max-w-4xl" v-if="showAlert">
+          <Rocket class="h-6 w-6 text-blue-500" />
+          <AlertTitle class="text-xl font-bold">Welcome to Your Wardrobe Management System!</AlertTitle>
+          <AlertDescription class="text-sm">
+        Please add a category before adding clothing items.
+          </AlertDescription>
+          <button @click="showAlert = false" class="absolute top-2 right-2 text-red-500">
+        <X class="h-4 w-4" />
+          </button>
+      </Alert>
       <!-- Filter/Search Bar -->
       <div class="flex flex-col sm:flex-row gap-3 mb-6 px-4">
         <div class="relative flex-1 max-w-md">

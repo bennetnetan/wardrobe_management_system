@@ -5,6 +5,9 @@ import { Head } from '@inertiajs/vue3';
 import { ShirtIcon } from 'lucide-vue-next';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import VueApexCharts from 'vue3-apexcharts';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Rocket, X } from 'lucide-vue-next'
+import { ref } from 'vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
   { title: 'Dashboard', href: '/dashboard' }
@@ -19,7 +22,10 @@ const props = defineProps<{
   categoryQuantity: Record<string, number>;
   categoryTotal: Record<string, number>;
 }>();
+// Alert state
+const showAlert = ref(true);
 
+// Pie Chart Configuration
 // Pie Chart Configuration
 const pieChartOptions = {
   labels: Object.keys(props.categoryTotal),
@@ -48,7 +54,16 @@ const barChartSeries = [{
 
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-6 rounded-xl p-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-      
+      <Alert class="mb-6 w-full max-w-[335px] lg:max-w-4xl" v-if="showAlert">
+          <Rocket class="h-6 w-6 text-blue-500" />
+          <AlertTitle class="text-xl font-bold">Welcome to Your Wardrobe Management System!</AlertTitle>
+          <AlertDescription class="text-sm">
+        Check out the stats below. If nothing appears, start by adding some categories and then your clothing items.
+          </AlertDescription>
+          <button @click="showAlert = false" class="absolute top-2 right-2 text-red-500">
+        <X class="h-4 w-4" />
+          </button>
+      </Alert>
       <!-- Top Statistics Section -->
       <div class="grid auto-rows-min gap-6 md:grid-cols-3">
         <!-- Total Number of Clothes -->
