@@ -96,7 +96,7 @@ class ClothingController extends Controller
             ->get();
 
         // Calculate totals directly from collection
-        $total = $clothing->sum('price');
+        $total = $clothing->sum(fn($item) => $item->price * $item->quantity);
         $quantity = $clothing->sum('quantity');
 
         // Get unique categories actually used in clothing
