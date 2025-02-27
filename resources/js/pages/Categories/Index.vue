@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell, TableEmpty } from '@/components/ui/table/';
@@ -9,6 +7,7 @@ import { ref, computed } from 'vue';
 import { Input } from '@/components/ui/input';
 import { Plus, X, Search } from 'lucide-vue-next';
 import Button from '@/components/ui/button/Button.vue';
+import { Head } from '@inertiajs/vue3';
 
 const props = defineProps<{
     categories: Array<{ id: number, name: string }>,
@@ -55,7 +54,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         >
           <Plus class="h-4 w-4" /> Create Category
         </Button> 
-        <h1 class="text-2xl font-semibold text-gray-200 pl-5 pt-3">Categories</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-200 pl-5 pt-3">Categories</h1>
       </div>
 
       <!-- Search Bar -->
@@ -70,7 +69,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         </div>
         <Button 
           @click="searchTerm = ''" 
-          class="h-10 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+          class="h-10 px-3 py-2 bg-gray-900 dark:bg-slate-600 hover:bg-gray-600 rounded-md transition-colors"
           title="Clear search"
         >
           <X class="h-4 w-4" />
@@ -80,7 +79,7 @@ const breadcrumbs: BreadcrumbItem[] = [
       <!-- Data Table -->
       <div class="rounded-lg border border-gray-500 overflow-hidden">
         <Table class="w-full">
-          <TableHeader class="bg-gray-900 text-gray-700">
+          <TableHeader class="bg-gray-900 text-gray-700 hover:bg-blue-600 hover:text-black transition-colors">
             <TableRow>
               <TableHead class="px-4 py-3">Name</TableHead>
               <TableHead class="px-4 py-3 w-32">Actions</TableHead>

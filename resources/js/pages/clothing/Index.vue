@@ -4,7 +4,7 @@ import { route } from 'ziggy-js';
 import { Head } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Table, TableBody, TableCaption, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table/';
+import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from '@/components/ui/table/';
 import { ref, computed } from 'vue';
 import { Select, SelectItem, SelectValue, SelectTrigger, SelectContent } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
@@ -13,19 +13,26 @@ import Button from '@/components/ui/button/Button.vue';
 
 const props = defineProps<{
     name?: string,
-    clothing?: Array<{ id: number, name: string, price: number, description: string, quantity: number; category: string}>,
+    clothing?: Array<{ id: number, name: string, price: number, description: string, quantity: number; category_id: number }>,
+    categories?: Array<{ id: number, name: string }>,
 }>();
 
 const searchTerm = ref('');
 const selectedCategory = ref('');
 
 const filteredClothing = computed(() => {
-    return props.clothing?.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
-                            item.description.toLowerCase().includes(searchTerm.value.toLowerCase());
-        const matchesCategory = !selectedCategory.value || item.category === selectedCategory.value;
-        return matchesSearch && matchesCategory;
-    }) ?? [];
+    return (Array.isArray(props.clothing) ? props.clothing : []).filter(item => {
+      const matchesSearch = item.name.toLowerCase().includes(searchTerm.value.toLowerCase()) ||
+                item.description.toLowerCase().includes(searchTerm.value.toLowerCase());
+      const matchesCategory = !selectedCategory.value || item.category_id === Number(selectedCategory.value);
+      return matchesSearch && matchesCategory;
+    }).map(item => {
+      const category = props.categories?.find(cat => cat.id === item.category_id);
+      return {
+        ...item,
+        category: category ? category.name : 'Unknown'
+      };
+    });
 });
 
 const editItem = (id: number) => {
@@ -62,7 +69,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         >
           <Plus class="h-4 w-4" /> Add Item
         </Button> 
-        <h1 class="text-2xl font-semibold text-gray-200 pl-5 pt-3">Clothing Inventory</h1>
+        <h1 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 pl-5 pt-3">Clothing Inventory</h1>
       </div>
 
       <!-- Filter/Search Bar -->
@@ -81,16 +88,15 @@ const breadcrumbs: BreadcrumbItem[] = [
             <SelectTrigger>
               <SelectValue placeholder="Filter by Category" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="tops">Tops</SelectItem>
-              <SelectItem value="bottoms">Bottoms</SelectItem>
-              <SelectItem value="shoes">Shoes</SelectItem>
+            <SelectContent
+            position="popper" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" >
+              <SelectItem :value="category.id" v-for="category in categories">{{ category.name }}</SelectItem>  
             </SelectContent>
           </Select>
           
           <Button 
             @click="selectedCategory = ''; searchTerm = ''" 
-            class="h-10 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+            class="h-10 px-3 py-2 bg-gray-900 dark:bg-slate-300 hover:bg-gray-600 rounded-md transition-colors"
             title="Clear filters"
           >
             <X class="h-4 w-4" />

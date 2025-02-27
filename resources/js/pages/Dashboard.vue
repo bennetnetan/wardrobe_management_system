@@ -111,7 +111,7 @@ const barChartSeries = [{
           <CardHeader>
             <CardTitle class="text-center">Quantity per Category</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent text-center class="text-slate-900">
             <VueApexCharts
               type="bar"
               height="350"

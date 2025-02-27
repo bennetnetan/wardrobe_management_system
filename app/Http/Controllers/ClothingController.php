@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Clothing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 use function Pest\Laravel\call;
@@ -14,8 +15,12 @@ class ClothingController extends Controller
     // List all clothing items
     public function index()
     {
-        $clothing = Clothing::all();
-        return Inertia::render('clothing/Index', ['clothing' => $clothing]);
+        $clothing = Clothing::where('user_id', Auth::id())->get();
+        // dd($clothing);
+        return Inertia::render('clothing/Index', [
+            'clothing' => $clothing,
+            'categories' => Category::all()
+        ]);
     }
 
     // Show the form for creating a new clothing item
@@ -36,6 +41,9 @@ class ClothingController extends Controller
             'quantity' => 'required|integer',
             'category_id' => 'required|exists:categories,id',
         ]);
+
+        // Add the user ID to the request
+        $request->merge(['user_id' => Auth::user()->id]);
 
         Clothing::create($request->all());
 
@@ -59,7 +67,11 @@ class ClothingController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'quantity' => 'required|integer',
+            'category_id' => 'required|exists:categories,id',
         ]);
+
+        // Add the user ID to the request
+        $request->merge(['user_id' => Auth::user()->id]);
 
         $clothing->update($request->all());
 
@@ -76,7 +88,7 @@ class ClothingController extends Controller
     // Get clothing data for Dashboard
     public function dashboard()
     {
-        $clothing = Clothing::all();
+        $clothing = Clothing::all()->where('user_id', Auth::user()->id);
         $total = $clothing->sum('price');
         $quantity = $clothing->sum('quantity');
         

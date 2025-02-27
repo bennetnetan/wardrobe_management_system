@@ -24,7 +24,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Categories/Create');
+        return Inertia::render('Categories/Form');
     }
 
     /**
@@ -57,7 +57,9 @@ class CategoryController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        return Inertia::render('Categories/Form', [
+            'category' => Category::findOrFail($id)
+        ]);
     }
 
     /**
