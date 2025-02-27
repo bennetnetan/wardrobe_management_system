@@ -14,7 +14,7 @@ import Button from '@/components/ui/button/Button.vue';
 
 const props = defineProps<{
     name?: string,
-    clothing?: Array<{ id: number, name: string, price: number, description: string, quantity: number; category_id: number }>,
+    clothing?: Array<{ id: number, name: string, price: number | string, description: string, quantity: number; category_id: number }>,
     categories?: Array<{ id: number, name: string }>,
 }>();
 
@@ -32,7 +32,8 @@ const filteredClothing = computed(() => {
       const category = props.categories?.find(cat => cat.id === item.category_id);
       return {
         ...item,
-        category: category ? category.name : 'Unknown'
+        category: category ? category.name : 'Unknown',
+        price: typeof item.price === 'number' ? item.price : parseFloat(item.price)
       };
     });
 });
